@@ -1,22 +1,45 @@
-# Ignore Python cache and virtual environment
+# Large files that exceed GitHub's 100MB limit
+models/clip-vit-base-patch32/model.safetensors
+*.pdf
+
+# Python cache and virtual environment
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
+*.pyo
+*.pyd
 *.so
 .Python
 venv/
 env/
 ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
 
-# Ignore Jupyter Notebook checkpoints
+# Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
-# Ignore vector store and pickle files (optional - remove if you want to include them)
+# Vector store and pickle files (RAG project)
 vector_index.pkl
 *.pkl
 
-# Ignore data directory (optional - remove if you want to include PDFs)
+# Data directory (PDFs for RAG)
 data/
+
+# Testing and coverage
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.mypy_cache
+.pytest_cache
+.hypothesis
 
 # IDE specific files
 .vscode/
@@ -28,7 +51,10 @@ data/
 # OS specific files
 .DS_Store
 Thumbs.db
+ehthumbs.db
 desktop.ini
+Desktop.ini
+.git
 
 # Model files
 *.bin
