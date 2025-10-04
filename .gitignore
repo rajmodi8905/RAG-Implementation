@@ -1,0 +1,36 @@
+# Ignore Python cache and virtual environment
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore vector store and pickle files (optional - remove if you want to include them)
+vector_index.pkl
+*.pkl
+
+# Ignore data directory (optional - remove if you want to include PDFs)
+data/
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Model files
+*.bin
+*.safetensors
+models/
