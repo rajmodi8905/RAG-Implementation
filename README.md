@@ -1,6 +1,8 @@
-# 🔍 Multimodal RAG Face Recognition System
+# RAG Implementation - Face Recognition Module
 
-A complete face recognition and similarity matching system that extracts faces from PDFs, associates them with names, and enables intelligent face matching using CLIP embeddings.
+This repository contains a comprehensive multimodal RAG (Retrieval-Augmented Generation) system focused on face recognition and similarity matching using CLIP embeddings.
+
+**Note: This is the Face Recognition Module branch of the larger RAG Implementation project.**
 
 ## 🚀 Features
 
