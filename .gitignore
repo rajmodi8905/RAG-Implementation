@@ -2,18 +2,33 @@
 models/clip-vit-base-patch32/model.safetensors
 *.pdf
 
-# System files
-.DS_Store
+# Python cache and virtual environment
 __pycache__/
+*.py[cod]
+*$py.class
 *.pyc
 *.pyo
 *.pyd
+*.so
 .Python
-env/
 venv/
+env/
+ENV/
 .venv
 pip-log.txt
 pip-delete-this-directory.txt
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Vector store and pickle files (RAG project)
+vector_index.pkl
+*.pkl
+
+# Data directory (PDFs for RAG)
+data/
+
+# Testing and coverage
 .tox
 .coverage
 .coverage.*
@@ -22,19 +37,26 @@ nosetests.xml
 coverage.xml
 *.cover
 *.log
-.git
 .mypy_cache
 .pytest_cache
 .hypothesis
 
-# IDE files
+# IDE specific files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS generated files
+# OS specific files
+.DS_Store
 Thumbs.db
 ehthumbs.db
+desktop.ini
 Desktop.ini
+.git
+
+# Model files
+*.bin
+*.safetensors
+models/

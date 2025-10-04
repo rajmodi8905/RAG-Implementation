@@ -133,3 +133,31 @@ This project is open source and available under the MIT License.
 - OpenAI CLIP for powerful vision-language embeddings
 - OpenCV for face detection capabilities
 - PyMuPDF for PDF processing
+
+---
+
+## 📦 Repository Contents
+
+### PDF RAG Chatbot Files:
+- `chatbot.py` - Interactive PDF question-answering chatbot
+- `retrieval.ipynb` - Jupyter notebook with RAG implementation
+- `requirements.txt` - Python dependencies
+- `CHATBOT_IMPROVEMENTS.md` - Documentation of chatbot enhancements
+
+### Face Recognition Files:
+- `image_matcher.py` - Interactive face similarity matcher
+- `simple_image_matcher.py` - Simple drag-and-drop interface
+- `spatial_name_matcher.py` - PDF spatial analysis
+- `extract_images_from_pdf.py` - PDF image extraction
+- `test_images/` - Face database (370+ images)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📄 License
+
+This project is open source and available under the MIT License.
