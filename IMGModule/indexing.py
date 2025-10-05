@@ -13,7 +13,11 @@ def index_images(model, processor, device, images_dir, index_path, metadata_path
     - Rebuilds the index only if images have been deleted.
     - Skips if no changes are detected.
     """
-    all_image_paths = glob.glob(os.path.join(images_dir, '*.*'))
+    image_extensions = ['jpg', 'jpeg', 'png', 'webp']
+    all_image_paths = []
+    
+    for ext in image_extensions:
+        all_image_paths.extend(glob.glob(os.path.join(images_dir, f'*.{ext}')))
 
     if not all_image_paths and not os.path.exists(index_path):
         print(f"⚠️ No images found in '{images_dir}' and no index exists.")
