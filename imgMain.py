@@ -10,7 +10,7 @@ from IMGModule.search import perform_semantic_search
 # --- 2. DEFINE CONSTANTS AND PATHS ---
 
 # Directory where your images are stored
-IMAGES_DIR = 'test_images'
+IMAGES_DIR = 'all_images'
 
 # Directory to save the generated index and metadata
 INDEX_DIR = 'ImgIndexStore'
@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     print("--- Performing a Semantic Search ---")
     # Define a sample query to search for
-    search_query = "A person with yellow tshirt"
+    search_query = "image of a team playing football"
     print(f"Searching for query: '{search_query}'")
 
     # This function will load the index and find the most relevant images
