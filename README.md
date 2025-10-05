@@ -27,8 +27,11 @@ RAG-Implementation/
 ├── test_images/                  # Face database (251 named + 120 unnamed)
 ├── models/                       # Local CLIP model (download required)
 └── requirements.txt              # Python dependencies
-├──  stt_whispercpp.py             # Wrapper for Whisper.cpp (Speech → Text)
-├──  tts_piper.py                  # Wrapper for Piper (Text → Speech)
+├── audio_tools/ 
+└──  stt_whispercpp.py            # Wrapper for Whisper.cpp (Speech → Text)
+└──  tts_piper.py                 # Wrapper for Piper (Text → Speech)
+└──README.md
+└── sample_audio                  # Test input/output WAV files
 ```
 
 ## 🛠️ Setup Instructions
