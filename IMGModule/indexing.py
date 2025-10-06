@@ -1,3 +1,5 @@
+# IMGModule/indexing.py
+
 import os
 import glob
 import numpy as np
@@ -8,22 +10,25 @@ from tqdm.auto import tqdm
 
 def index_images(model, processor, device, images_dir, index_path, metadata_path):
     """
-    Synchronizes the FAISS index with the image directory using an efficient strategy:
-    - Appends embeddings for new images.
-    - Rebuilds the index only if images have been deleted.
-    - Skips if no changes are detected.
+    Synchronizes the FAISS index with the image directory using an efficient strategy.
     """
     all_image_paths = glob.glob(os.path.join(images_dir, '*.*'))
+    
+    # --- NEW: Get the directory path from the index_path ---
+    index_directory = os.path.dirname(index_path)
+    
+    # --- NEW: Ensure the directory for the index and metadata exists ---
+    os.makedirs(index_directory, exist_ok=True)
+
 
     if not all_image_paths and not os.path.exists(index_path):
         print(f"⚠️ No images found in '{images_dir}' and no index exists.")
         return
 
-    # Get the list of image filenames currently on disk
     current_filenames = {os.path.basename(p) for p in all_image_paths}
     
-    # --- Step 1: Check if an index exists and determine the update strategy ---
     if os.path.exists(index_path):
+        # ... (the rest of the logic for updating the index is unchanged) ...
         print("Found existing index. Checking for updates...")
         existing_metadata = list(np.load(metadata_path, allow_pickle=True))
         existing_filenames = set(existing_metadata)
@@ -35,7 +40,6 @@ def index_images(model, processor, device, images_dir, index_path, metadata_path
             print("✅ Index is already up-to-date. No changes needed.")
             return
             
-        # --- STRATEGY 1: EFFICIENT APPEND (Only new files) ---
         if new_files and not deleted_files:
             print(f"Update summary: {len(new_files)} new files found. Appending to index.")
             
@@ -65,9 +69,8 @@ def index_images(model, processor, device, images_dir, index_path, metadata_path
                 faiss.write_index(index, index_path)
                 np.save(metadata_path, updated_metadata)
                 print(f"✅ Index updated successfully. Total images indexed: {index.ntotal}")
-            return # Stop here after the append operation
+            return
 
-        # --- STRATEGY 2: REBUILD (Deletions were detected) ---
         else:
             print(f"Update summary: {len(deleted_files)} files deleted, {len(new_files)} files added. Rebuilding index.")
             final_filenames = list(existing_filenames - deleted_files) + list(new_files)
@@ -79,11 +82,9 @@ def index_images(model, processor, device, images_dir, index_path, metadata_path
             final_image_paths = [os.path.join(images_dir, fname) for fname in final_filenames]
             
     else:
-        # --- INITIAL INDEXING MODE ---
         print("No existing index found. Building a new one from scratch.")
         final_image_paths = all_image_paths
 
-    # --- This block is now used for both initial indexing and rebuilding ---
     all_embeddings = []
     all_metadata = []
 
@@ -109,4 +110,3 @@ def index_images(model, processor, device, images_dir, index_path, metadata_path
         faiss.write_index(index, index_path)
         np.save(metadata_path, np.array(all_metadata))
         print(f"✅ Indexing complete! {index.ntotal} images are now indexed.")
-
