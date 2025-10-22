@@ -66,20 +66,6 @@ This repository implements a **local, offline multimodal RAG pipeline** that:
 - ~600 MB free for CLIP model download
 - Sufficient RAM for running Ollama + model
 
-### 🔧 Python dependencies
-
-(Installed with `pip install -r requirements.txt` — ensure the file in repo is up-to-date.)
-
-Key libraries used:
-- `streamlit` — GUI
-- `chromadb` — vector DB
-- `openai-whisper` — local transcription
-- `torch` / `transformers` (if used by Whisper/CLIP)
-- `ftfy`, `tqdm`, `numpy`, `scipy`
-- `python-multipart` / other helpers for file handling
-
-> 📝 See `requirements.txt` for full pin list. If missing or out-of-date, add versions used during development.
-
 ---
 
 ## 🚀 Quickstart / Setup
