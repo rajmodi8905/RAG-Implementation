@@ -109,8 +109,13 @@ def process_uploaded_file(uploaded_file, progress):
 # --- NEW: Function to handle image saving and indexing ---
 def process_image_upload(uploaded_file, progress):
     """Saves the uploaded image and updates the FAISS index."""
+    # Ensure the 'all_images' directory exists
+    if not os.path.exists(IMAGES_DIR):
+        os.makedirs(IMAGES_DIR)
+        print(f"Created directory: {IMAGES_DIR}")
+
     progress.text(f"Saving image: {uploaded_file.name}...")
-    
+
     # Save the image to the 'all_images' directory
     save_path = os.path.join(IMAGES_DIR, uploaded_file.name)
     with open(save_path, "wb") as f:
