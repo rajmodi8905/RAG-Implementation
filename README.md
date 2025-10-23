@@ -1,169 +1,206 @@
-# 🎓 RAG Implementation - Complete Multimodal System
+# 🤖 Offline Multimodal RAG
 
-This repository contains a comprehensive multimodal RAG (Retrieval-Augmented Generation) system with two main components:
+> **Multimodal Retrieval-Augmented Generation (RAG)** — an offline desktop/edge-first pipeline for contextual question-answering over PDFs + audio, and natural-language image search. Fast, privacy-friendly, and designed to run locally using Ollama + local embedding/index stores.
 
-1. **📄 PDF RAG Chatbot** - Question-answering system for PDF documents using Ollama
-2. **🔍 Face Recognition System** - Face matching and similarity detection using CLIP embeddings
+---
 
-## 🚀 Features
+## 📑 Table of Contents
+- [Project Overview](#-project-overview)
+- [Core Features](#-core-features)
+- [Architecture & Components](#-architecture--components)
+- [Requirements](#-requirements)
+- [Quickstart / Setup](#-quickstart--setup)
+- [Usage](#-usage)
+- [Configuration](#-configuration)
+- [How It Works](#-how-it-works-high-level)
+- [Contributing](#-contributing)
+- [Acknowledgments & References](#-acknowledgments--references)
 
-- **PDF Face Extraction**: Automatically extracts face images from PDF documents
-- **Smart Name Matching**: Uses spatial analysis to associate names with faces
-- **AI-Powered Similarity**: CLIP-based embedding for accurate face matching  
-- **Offline Operation**: Works completely offline once set up
-- **Multiple Interfaces**: Interactive and simple command-line interfaces
-- **Intelligent Filtering**: Removes non-face images and academic text
+---
 
-## 📁 Project Structure
+## 🎯 Project Overview
 
-```
-RAG-Implementation/
-├── image_matcher.py              # Interactive face similarity matcher
-├── simple_image_matcher.py       # Simple drag-and-drop interface  
-├── spatial_name_matcher.py       # PDF spatial analysis for name-photo matching
-├── extract_images_from_pdf.py    # PDF image extraction with face filtering
-├── download_model.py             # CLIP model downloader
-├── smart_name_extractor.py       # Name extraction from PDF
-├── test_images/                  # Face database (251 named + 120 unnamed)
-├── models/                       # Local CLIP model (download required)
-└── requirements.txt              # Python dependencies
-├── audio_tools/ 
-└──  stt_whispercpp.py            # Wrapper for Whisper.cpp (Speech → Text)
-└──  tts_piper.py                 # Wrapper for Piper (Text → Speech)
-└──README.md
-└── sample_audio                  # Test input/output WAV files
-```
+This repository implements a **local, offline multimodal RAG pipeline** that:
 
-## 🛠️ Setup Instructions
+- 📄 Extracts and indexes text from **PDFs** and **transcribed audio**, storing chunks in a vector DB (Chromadb).
+- 💬 Uses a local LLM (phi3:mini-128k via Ollama) to condition answer generation on relevant retrieved chunks.
+- 🖼️ Provides **natural-language image querying**: describe an image in natural language and the top-k matching images are returned (using CLIP embeddings & local search).
+- 🎨 Bundled with a Streamlit GUI for uploading assets and querying the system locally.
 
-### 1. Clone the Repository
+> 🔒 Designed for privacy-conscious environments and fast local experimentation without sending data to the cloud.
+
+---
+
+## ✨ Core Features
+
+### 1. 📚 PDF + Audio Contextual QA
+   - PDF text extraction → chunking → embed → store in Chromadb.
+   - Audio → Whisper transcription → chunk → embed → store in Chromadb.
+   - Query flow: retrieve relevant chunks → augment prompt → LLM generates answers (phi3:mini-128k via Ollama).
+
+### 2. 🔍 Natural Language Image Search
+   - Uses CLIP embeddings (downloaded locally) to embed images in `all_images` (configurable).
+   - Search by natural-language prompt; returns top-k images ranked by cosine similarity.
+
+---
+
+## 🏗️ Architecture & Components
+
+- 🖥️ **Frontend / UI**: Streamlit app (`app.py`) — upload PDFs/audio/images, run search/QA.
+- 🧠 **Embeddings & Index**:
+  - CLIP (local download via `download_clip.py`) for image embeddings.
+  - Text embeddings and storage: **Chromadb** (local/embedded mode).
+- 🎙️ **Speech-to-Text**: `openai-whisper` for audio transcription (local).
+- 🤖 **Local LLM**: Ollama running `phi3:mini-128k` for response generation (local inference).
+- 📊 **Indexing**: Chromadb for text embeddings indexing and FAISS for image embeddings indexing.  
+- 💾 **Storage**:
+  - Text embeddings & metadata are stored in chromadb files.
+  - Image embeddings are stored in a bin file and metadata in an npy file.
+
+---
+
+## 📋 Requirements
+
+- Python 3.10+ (recommended)
+- `pip` + virtual environment
+- ~600 MB free for CLIP model download
+- Sufficient RAM for running Ollama + model
+
+---
+
+## 🚀 Quickstart / Setup
+
+### 1. 📥 Clone repository
+
 ```bash
 git clone https://github.com/rajmodi8905/RAG-Implementation.git
 cd RAG-Implementation
 ```
 
-### 2. Create Virtual Environment
+### 2. 🐍 Create & activate Python venv
+
 ```bash
 python -m venv venv
-# On macOS/Linux:
+
+# macOS / Linux:
 source venv/bin/activate
-# On Windows:
+
+# Windows:
 venv\Scripts\activate
 ```
 
-### 3. Install Dependencies
+### 3. 📦 Install Python dependencies
+
 ```bash
-pip install torch transformers pillow opencv-python PyMuPDF pytesseract pdf2image
+pip install -r requirements.txt
 ```
 
-### 4. Download CLIP Model
+### 4. ⬇️ Download CLIP model
+
 ```bash
-python download_model.py
+python download_clip.py
 ```
-This downloads the CLIP model (~577MB) to `models/clip-vit-base-patch32/`
 
-### 5. Add Your PDF (Optional)
-Place your PDF document in the root directory to extract faces and names.
+This downloads the CLIP model (~577 MB) to `clip-model/`.
 
-## 🎯 Usage
+### 5. 🛠️ Install Ollama (local LLM runner)
 
-### Face Similarity Matching
+Download and install Ollama following their official instructions:  
+👉 [https://ollama.com/download](https://ollama.com/download)
 
-**Interactive Mode:**
+**Example (macOS / Linux):**
+
 ```bash
-python image_matcher.py
+curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-**Simple Mode:**
+### 6. 🤖 Download / run the phi3:mini-128k model with Ollama
+
+Once Ollama is installed you can pull/run the model locally. Example:
+
 ```bash
-python simple_image_matcher.py path/to/your/query/image.jpg
+ollama run phi3:mini-128k
 ```
 
-### Processing New PDFs
+### 7. ▶️ Run the Streamlit app
 
-**Extract Images from PDF:**
 ```bash
-python extract_images_from_pdf.py
+streamlit run app.py
 ```
 
-**Match Names with Faces:**
-```bash
-python spatial_name_matcher.py
-```
-
-## 📊 Performance
-
-- **Database Size**: 371 face images (251 named, 120 unnamed)
-- **Similarity Accuracy**: CLIP-based cosine similarity
-- **Processing Speed**: ~50 images/second on modern hardware
-- **Memory Usage**: ~2GB RAM (including model)
-
-## 🎨 Confidence Levels
-
-- 🟢 **Excellent (>0.85)**: Very likely the same person
-- 🟡 **Good (>0.70)**: Likely the same person  
-- 🟠 **Moderate (>0.55)**: Could be the same person
-- 🔴 **Low (<0.55)**: Likely different people
-
-## 🔧 Technical Details
-
-- **Model**: OpenAI CLIP ViT-Base-Patch32
-- **Face Detection**: OpenCV Haar Cascades
-- **PDF Processing**: PyMuPDF (fitz)
-- **Embeddings**: 512-dimensional CLIP features
-- **Similarity**: Cosine similarity matching
-
-## 📚 Example Results
-
-```
-🎯 BEST MATCH FOUND!
-Query Image: my_photo.jpg
-Matched Person: Raj Amit Modi
-Similarity Score: 0.8543
-🟢 EXCELLENT - Very likely the same person!
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
-## 🙏 Acknowledgments
-
-- OpenAI CLIP for powerful vision-language embeddings
-- OpenCV for face detection capabilities
-- PyMuPDF for PDF processing
+Open `http://localhost:8501` (or the URL Streamlit prints) to use the GUI.
 
 ---
 
-## 📦 Repository Contents
+## 💻 Usage
 
-### PDF RAG Chatbot Files:
-- `chatbot.py` - Interactive PDF question-answering chatbot
-- `retrieval.ipynb` - Jupyter notebook with RAG implementation
-- `requirements.txt` - Python dependencies
-- `CHATBOT_IMPROVEMENTS.md` - Documentation of chatbot enhancements
+### 🎨 UI
 
-### Face Recognition Files:
-- `image_matcher.py` - Interactive face similarity matcher
-- `simple_image_matcher.py` - Simple drag-and-drop interface
-- `spatial_name_matcher.py` - PDF spatial analysis
-- `extract_images_from_pdf.py` - PDF image extraction
-- `test_images/` - Face database (370+ images)
+- 📤 Upload PDFs, audio files (wav/mp3), or images via the Streamlit GUI.
+- 📝 For PDFs/audio: the system will extract/transcribe and index.
+- 🔎 For queries:
+  - **Text QA**: ask a question — the app will retrieve relevant chunks from Chromadb, augment the LLM prompt, and return an answer.
+  - **Image Search**: enter a natural-language description; top-k matching images (from `IMAGES_DIR`) are returned.
+
+---
+
+## ⚙️ Configuration
+
+You can change these configurations in the `backend.py`:
+
+- 📁 `IMAGES_DIR` — default `'all_images'` (change to your image folder's relative path).
+
+---
+
+## 🔄 How It Works (high level)
+
+### 1. 📥 Ingestion
+
+- **PDFs**: Extract text (e.g., `pdfminer`/`PyMuPDF`), clean, chunk (overlap + sliding window), embed each chunk, store embeddings and metadata in Chromadb.
+- **Audio**: Transcribe with `openai-whisper` locally, chunk transcript, embed and store in Chromadb.
+- **Images**: Compute CLIP image embeddings and persist to a local index (Chromadb or FAISS).
+
+### 2. 🔍 Retrieval
+
+On user query, compute embedding for the query (text → embedding) and perform k-NN search in the vector DB to retrieve the most relevant chunks/images.
+
+### 3. 🎯 Generation
+
+Build an augmented prompt that includes retrieved chunks and the user question; send to local LLM (phi3:mini-128k running on Ollama) to generate an answer.
+
+### 4. ✅ Return
+
+Present LLM output and provenance (e.g., which PDF or audio chunk(s) the answer used — ensure you surface source metadata where helpful).
+
+---
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+Thank you for considering contributing! Add step-by-step guidance:
 
-## 📄 License
+1. 🍴 Fork the repository.
+2. 🌿 Create a feature branch:
+   ```bash
+   git checkout -b feat/my-feature
+   ```
+3. ✏️ Make changes and add tests where applicable.
+4. 📦 Ensure `requirements.txt` is updated if dependencies change.
+5. 🔀 Create a pull request with a clear description of the change and motivation.
 
-This project is open source and available under the MIT License.
+---
+
+## 🙏 Acknowledgments & References
+
+- **Ollama** — local LLM runner & model registry  
+  👉 [https://ollama.com](https://ollama.com)
+- **Phi-3 model** — small and efficient 128k context window LLM used for generation
+- **OpenAI Whisper** — used for offline speech-to-text transcription  
+  👉 [https://github.com/openai/whisper](https://github.com/openai/whisper)
+- **CLIP (OpenAI)** — used for image-text embeddings  
+  👉 [https://github.com/openai/CLIP](https://github.com/openai/CLIP)
+
+---
+
+<div align="center">
+Made with ❤️ by Team Phoenix
+</div>
